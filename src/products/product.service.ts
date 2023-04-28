@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker"
-import { TProduct } from "../models/products.model"
+import { TProduct } from "./products.model"
 import boom from '@hapi/boom'
 
 class ProductService {

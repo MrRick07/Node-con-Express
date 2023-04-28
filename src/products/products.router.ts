@@ -1,6 +1,8 @@
 import express, { NextFunction, Request, Response } from 'express'
-import { TProduct } from '../models/products.model'
-import ProductService from '../services/product.service'
+import { TProduct } from './products.model'
+import ProductService from './product.service'
+import validatorHandler from '../middlewares/validator.handle'
+import { createProductSchema, updateProductSchema, getProductSchema } from './product.dto'
 
 const router = express.Router()
 const service = new ProductService()
@@ -14,15 +16,17 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
     }
 })
 
-router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const { id } = req.params
-        const product = await service.findOne(id)
-        res.json(product)
-    } catch (error) {
-        next(error)
-    }
-})
+router.get('/:id',
+    validatorHandler(getProductSchema, 'params'),
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const { id } = req.params
+            const product = await service.findOne(id)
+            res.json(product)
+        } catch (error) {
+            next(error)
+        }
+    })
 
 // router.get('/filter', async (req: Request, res: Response) => {
 //     // res.send('Hello World!')
@@ -32,11 +36,13 @@ router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
 //     })
 // })
 
-router.post('/', async (req: Request, res: Response, next: NextFunction) => {
-    const product: TProduct = req.body
-    const newProduct: TProduct = await service.create(product)
-    res.status(201).json(newProduct)
-})
+router.post('/',
+    validatorHandler(createProductSchema, 'body'),
+    async (req: Request, res: Response, next: NextFunction) => {
+        const product: TProduct = req.body
+        const newProduct: TProduct = await service.create(product)
+        res.status(201).json(newProduct)
+    })
 
 router.patch('/:id', async (req: Request, res: Response, next: NextFunction) => {
     try {
